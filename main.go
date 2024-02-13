@@ -1,18 +1,24 @@
 package main
 
 import (
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"rest-api-cuti-karyawan/app"
 	"rest-api-cuti-karyawan/controller"
-	"rest-api-cuti-karyawan/exception"
 	"rest-api-cuti-karyawan/helper"
 	"rest-api-cuti-karyawan/repository"
 	"rest-api-cuti-karyawan/service"
 
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/julienschmidt/httprouter"
 )
+
+func NewServer(router *httprouter.Router) *http.Server {
+	return &http.Server{
+		Addr:    "localhost:3000",
+		Handler: router,
+	}
+}
 
 func main() {
 	db := app.Database()
@@ -22,19 +28,8 @@ func main() {
 	newService := service.NewOffWorkServiceImpl(newRepository, db, validate)
 	newController := controller.NewOffWorkControllerImpl(newService)
 
-	router := httprouter.New()
-
-	router.GET("/api/offwork", newController.GetAll)
-	router.GET("/api/offwork/:id", newController.FindDataById)
-	router.POST("/api/offwork/create", newController.Create)
-	router.PATCH("/api/offwork/changestatus/:id", newController.UpdateStatus)
-
-	router.PanicHandler = exception.ErrorHandler
-
-	server := http.Server{
-		Addr:    "localhost:3000",
-		Handler: router,
-	}
+	router := app.NewRouter(newController)
+	server := NewServer(router)
 
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
