@@ -7,7 +7,7 @@ import (
 )
 
 func Database() *sql.DB {
-	db, err := sql.Open("mysql", "user:@unix(/cloudsql/dietin-capstone:asia-southeast2:pratugas-akhir)/offworks")
+	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/offwork_restapi?parseTime=true")
 	helper.PanicIfError(err)
 
 	//migrate -database "mysql://root:@unix(/cloudsql/dietin-capstone:asia-southeast2:pratugas-akhir)/offwork" -path db/migrations up

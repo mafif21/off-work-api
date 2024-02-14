@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"net/http"
 	"rest-api-cuti-karyawan/app"
 	"rest-api-cuti-karyawan/controller"
 	"rest-api-cuti-karyawan/helper"
+	"rest-api-cuti-karyawan/middleware"
 	"rest-api-cuti-karyawan/repository"
 	"rest-api-cuti-karyawan/service"
 
@@ -13,7 +13,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func NewServer(router *httprouter.Router) *http.Server {
+func NewServer(router *middleware.CorsMiddleware) *http.Server {
 	return &http.Server{
 		Addr:    "localhost:3000",
 		Handler: router,
@@ -29,7 +29,8 @@ func main() {
 	newController := controller.NewOffWorkControllerImpl(newService)
 
 	router := app.NewRouter(newController)
-	server := NewServer(router)
+	corsMiddleware := middleware.NewCorsMiddleware(router)
+	server := NewServer(corsMiddleware)
 
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
