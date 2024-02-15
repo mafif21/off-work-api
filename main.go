@@ -29,7 +29,8 @@ func main() {
 	newController := controller.NewOffWorkControllerImpl(newService)
 
 	router := app.NewRouter(newController)
-	corsHandler := cors.Default().Handler(router)
+	//corsMiddleware := middleware.NewCorsMiddleware(router)
+	corsHandler := cors.AllowAll().Handler(router)
 	server := NewServer(corsHandler)
 
 	err := server.ListenAndServe()
